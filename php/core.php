@@ -246,7 +246,6 @@ FrontEndEditor.data = <?php echo json_encode( $data ) ?>;
 		$args = self::get_args( $filter );
 		try {
 			
-			
 			if ( 'save' == $callback ) {
 				$content = stripslashes_deep( $_POST['content'] );
 				$result = $instance->save( $data, $content );
@@ -257,9 +256,8 @@ FrontEndEditor.data = <?php echo json_encode( $data ) ?>;
 				if ( 'rich' == $data['type'] ) {
 					$result = wpautop( $result );
 				}
-				$result = array( 'content' => $result );
 			}
-			
+			$result = array( 'content' => $result );
 			
 			
 		} catch ( Exception $e ) {
