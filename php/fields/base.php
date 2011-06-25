@@ -51,23 +51,27 @@ abstract class FEE_Field_Base {
 	 * @return string Wrapped content
 	 */
 	public function wrap( $content, $data ) {
-		if ( !$this->allow( $data ) )
+		if ( !$this->allow( $data ) ) {			
 			return $content;
+		}
 
 		$data = wp_parse_args( $data, array(
 			'type' => $this->input_type
 		) );
 
-		if ( 'rich' == $data['type'] && !FEE_Core::$options->rich )
+		if ( 'rich' == $data['type'] && !FEE_Core::$options->rich ) {
 			$data['type'] = 'textarea';
+		}
 
-		self::$wrapped[ $data['type'] ] = true;
+		self::$wrapped[ $data['type'] ] = true; 
 
-		if ( is_null( $content ) )
+		if ( is_null( $content ) ) {
 			$content = '';
+		}
 
-		if ( !is_scalar( $content ) )
+		if ( !is_scalar( $content ) ) {
 			trigger_error( "scalar expected. " . gettype( $content ) . " given", E_USER_WARNING );
+		}
 
 		$data = apply_filters( 'front_end_editor_wrap', $data, $this->filter );
 
@@ -83,13 +87,15 @@ abstract class FEE_Field_Base {
 
 		$data_attr['class'] = 'fee-field';
 
-		if ( $this->was_placeholded )
+		if ( $this->was_placeholded ) {
 			$data_attr['title'] = FEE_Core::get_title( $this->filter );
+		}
 
 		$wrap_tag = in_array( $data['type'], array( 'textarea', 'rich', 'widget' ) ) ? 'div' : 'span';
 
-		if ( 'div' == $wrap_tag )
+		if ( 'div' == $wrap_tag ) {
 			$data_attr['class'] .= ' fee-clearfix';
+		}
 
 		return html( $wrap_tag, $data_attr, $content );
 	}
