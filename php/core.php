@@ -14,7 +14,8 @@ abstract class FEE_Core {
 		self::$options = $options;
 
 		add_action( 'wp_ajax_front-end-editor', array( __CLASS__, 'ajax_response' ) );
-
+		add_action( 'wp_ajax_front-end-editor-link-query', array( __CLASS__, 'ajax_link_query_response' ) );
+		
 		add_action( 'template_redirect', array( __CLASS__, '_init' ) );
 		// TODO: Add equivalent hook for BuddyPress
 	}
@@ -113,8 +114,9 @@ FrontEndEditor.data = <?php echo json_encode( $data ) ?>;
 	private static function get_src( $handle ) {
 		global $wp_scripts;
 
-		if ( !is_object( $wp_scripts ) )
+		if ( !is_object( $wp_scripts ) ) {
 			$wp_scripts = new WP_Scripts;
+		}
 
 		return get_bloginfo('wpurl') . $wp_scripts->registered[$handle]->src;
 	}
@@ -171,8 +173,9 @@ FrontEndEditor.data = <?php echo json_encode( $data ) ?>;
 		foreach ( self::$active_fields as $filter => $args ) {
 			extract( $args );
 
-			if ( empty( $title ) )
+			if ( empty( $title ) ) {
 				continue;
+			}	
 
 			$instance = self::$instances[ $filter ];
 
@@ -182,8 +185,9 @@ FrontEndEditor.data = <?php echo json_encode( $data ) ?>;
 
 	static function get_fields() {
 		// Safe hook for new editable fields to be registered
-		if ( !did_action( 'front_end_editor_fields' ) )
+		if ( !did_action( 'front_end_editor_fields' ) ) {
 			do_action( 'front_end_editor_fields' );
+		}
 
 		return self::$fields;
 	}
@@ -191,7 +195,34 @@ FrontEndEditor.data = <?php echo json_encode( $data ) ?>;
 	static function get_args( $filter ) {
 		return self::$fields[ $filter ];
 	}
+	
+	/**
+	 * Handler for the aloha internal links plugin. 
+	 * This handler will retrive wordpress posts that match the given query.
+	 */
+	static function ajax_link_query_response() {
 
+		// Is user trusted?
+		check_ajax_referer( self::$nonce, 'nonce' );
+		$searchQuery  = $_POST['query'];
+		
+		$JSONresultSet = array();
+		//TODO find a way to add the searchQuery into the 
+		$WPresultSet = query_posts('&order=ASC');
+		
+		foreach ( $WPresultSet as $post) {
+			//TODO Add preliminary check here
+			array_push($JSONresultSet, array('id'=>$post->id,'name'=>$post->post_title, 'url'=>$post->guid , 'type'=>'wp_post', 'repositoryId'=>'wpInternalLinks'));
+		}
+		
+		$result = array("results"=>$JSONresultSet);
+		die( json_encode( $result ) );
+		
+	}
+
+	/**
+	 * Handler for front-end-editor post specific ajax requests like save,get 
+	 */
 	static function ajax_response() {
 		// Is user trusted?
 		check_ajax_referer( self::$nonce, 'nonce' );
@@ -203,28 +234,34 @@ FrontEndEditor.data = <?php echo json_encode( $data ) ?>;
 		self::make_instances();
 
 		// Is the current field defined?
-		if ( !$instance = self::$instances[ $filter ] )
+		if ( !$instance = self::$instances[ $filter ] ) {
 			die( -1 );
+		}
 
 		// Does the user have the right to do this?
-		if ( !$instance->check( $data ) || !$instance->allow( $data ) )
+		if ( !$instance->check( $data ) || !$instance->allow( $data ) ) {
 			die( -1 );
+		}
 
 		$args = self::get_args( $filter );
-
 		try {
+			
+			
 			if ( 'save' == $callback ) {
 				$content = stripslashes_deep( $_POST['content'] );
 				$result = $instance->save( $data, $content );
 				$result = @apply_filters( $filter, $result );
-			}
-			elseif ( 'get' == $callback ) {
+			} elseif ( 'get' == $callback ) {
 				$result = (string) $instance->get( $data );
 
-				if ( 'rich' == $data['type'] )
+				if ( 'rich' == $data['type'] ) {
 					$result = wpautop( $result );
+				}
+				$result = array( 'content' => $result );
 			}
-			$result = array( 'content' => $result );
+			
+			
+			
 		} catch ( Exception $e ) {
 			$result = array( 'error' => $e->getMessage() );
 		}

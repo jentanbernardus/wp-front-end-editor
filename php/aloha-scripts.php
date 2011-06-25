@@ -36,7 +36,6 @@ abstract class FEE_AlohaEditor {
 		wp_register_script('aloha-plugin-table', $alohaPluginsBaseUrl . 'Table/plugin.js', array(), self::VERSION);
 		wp_register_script('aloha-plugin-list',  $alohaPluginsBaseUrl . 'List/plugin.js', array(), self::VERSION);
 		wp_register_script('aloha-plugin-link', $alohaPluginsBaseUrl . 'Link/plugin.js', array(), self::VERSION);
-		wp_register_script('aloha-plugin-linklist', $alohaPluginsBaseUrl .'Link/LinkList.js', array(), self::VERSION);
 		wp_register_script('aloha-plugin-highlighteditables', $alohaPluginsBaseUrl . 'HighlightEditables/plugin.js', array(), self::VERSION);
 		wp_register_script('aloha-plugin-TOC', $alohaPluginsBaseUrl .'TOC/plugin.js' ,array(), self::VERSION);
 		wp_register_script('aloha-plugin-delicious', $alohaPluginsBaseUrl .'Link/delicious.js', array(), self::VERSION);
@@ -50,9 +49,9 @@ abstract class FEE_AlohaEditor {
 
 		// Custom Plugins
 		$alohaCustomPluginsBaseUrl = plugins_url('aloha-plugins/', FRONT_END_EDITOR_MAIN_FILE);
-
-		wp_enqueue_script('aloha-plugin-wp-savecancel', $alohaCustomPluginsBaseUrl. 'wpSaveCancel/plugin.js', array(), self::VERSION);
-		wp_enqueue_script('aloha-plugin-wp-image', $alohaCustomPluginsBaseUrl. 'wpImage/plugin.js', array(), self::VERSION);
+ 		wp_enqueue_script('aloha-plugin-wp-internallinks', $alohaCustomPluginsBaseUrl . 'wpInternalLinks/wordpress_internal_links_repository.js',array(), self::VERSION);
+		wp_enqueue_script('aloha-plugin-wp-savecancel', $alohaCustomPluginsBaseUrl . 'wpSaveCancel/plugin.js', array(), self::VERSION);
+		wp_enqueue_script('aloha-plugin-wp-image', $alohaCustomPluginsBaseUrl . 'wpImage/plugin.js', array(), self::VERSION);
 	}
 
 	private static function enqueue_debug() {
