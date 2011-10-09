@@ -54,6 +54,7 @@ abstract class FEE_Core {
 
 		$dev = defined( 'SCRIPT_DEBUG' ) ? '.dev' : '';
 
+		$js_dependencies = array( 'jquery' );
 		$css_dependencies = array();
 
 		// Autosuggest
